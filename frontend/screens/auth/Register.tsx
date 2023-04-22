@@ -21,11 +21,8 @@ import { Button, Icon } from "react-native-elements";
 import React, { useState } from "react";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { auth } from "../../../firebase/firebase";
-<<<<<<< HEAD
 import { FontAwesome } from "@expo/vector-icons";
 import { SCREENS } from "../types";
-=======
->>>>>>> cc1c08d (start backend)
 
 type RegisterProps = {};
 

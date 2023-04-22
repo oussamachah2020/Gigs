@@ -15,11 +15,7 @@ import {
   SIZES,
 } from "../../constants/Theme";
 import { useNavigation } from "@react-navigation/native";
-<<<<<<< HEAD
-=======
-import { Icon } from "react-native-elements";
-import { auth } from "../../../firebase/firebase";
->>>>>>> cc1c08d (start backend)
+
 import { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { SCREENS } from "../types";
