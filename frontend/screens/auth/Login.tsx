@@ -19,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { SCREENS } from "../types";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import axios from "axios";
 
 type Props = {};
 interface formDataType {
@@ -31,38 +33,45 @@ const Login = (props: Props) => {
     email: "",
     password: "",
   });
+  const [user, setUser] = useState<object | null>();
   const navigation = useNavigation();
 
-  const [user, setUser] = useState<firebase.default.User>();
+  // const [user, setUser] = useState<firebase.default.User>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [visible, setVisible] = useState(false);
 
-  const loginToAccount = () => {
-    navigation.navigate(SCREENS.HOME_SCREEN as never);
-    // for (const field in formData) {
-    //   if (!formData[field as keyof formDataType]) {
-    //     Toast.show({
-    //       type: "error",
-    //       text1: "Please enter your informations",
-    //     });
-    //   } else {
-    //     auth
-    //       .signInWithEmailAndPassword(formData.email, formData.password)
-    //       .then((userCredential) => {
-    //         const user = userCredential.user;
-    //         AsyncStorage.setItem("userData", JSON.stringify(user));
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
+  const loginToAccount = async () => {
+    setIsLoading(true);
+    for (const field in formData) {
+      if (!formData[field as keyof formDataType]) {
+        Toast.show({
+          type: "error",
+          text1: "Please enter your informations",
+        });
+        setIsLoading(false);
+      } else {
+        await axios
+          .post("http://192.168.107.222:6000/api/candidate/login", formData)
+          .then((response) => {
+            return response.data;
+          })
+          .then((data) => {
+            setIsLoading(false);
+            console.log(data);
+            setUser(data);
+            navigation.navigate(SCREENS.PHONE_SCREEN as never);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
 
-    //     setFormData((prev) => ({
-    //       ...prev,
-    //       email: "",
-    //       password: "",
-    //     }));
-    //   }
-    // }
+        setFormData((prev) => ({
+          ...prev,
+          email: "",
+          password: "",
+        }));
+      }
+    }
   };
 
   const handleEmailChange = (emailValue: string) => {
@@ -151,13 +160,7 @@ const Login = (props: Props) => {
             paddingHorizontal: 150,
             paddingVertical: 10,
           }}
-          onPress={() => {
-            setIsLoading(true);
-            setInterval(() => {
-              setIsLoading(false);
-              navigation.navigate(SCREENS.HOME_SCREEN as never);
-            }, 3000);
-          }}
+          onPress={loginToAccount}
         >
           <Text
             style={{

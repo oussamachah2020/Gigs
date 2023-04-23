@@ -86,7 +86,7 @@ const Intro = (props: Props) => {
               fontFamily: FONTS.semiBold,
             }}
           >
-            Start as a condidate
+            Start as a candidate
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

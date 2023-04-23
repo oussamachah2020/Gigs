@@ -5,6 +5,8 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { Intro, Login, Register, Home } from "./frontend/screens";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { SCREENS } from "./frontend/screens/types";
+import Verification from "./frontend/screens/Verification";
+import PhoneNumber from "./frontend/screens/PhoneNumber";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +36,11 @@ export default function App() {
           <Stack.Screen name={SCREENS.LOGIN_SCREEN} component={Login} />
           <Stack.Screen name={SCREENS.REGISTER_SCREEN} component={Register} />
           <Stack.Screen name={SCREENS.HOME_SCREEN} component={Home} />
+          <Stack.Screen name={SCREENS.PHONE_SCREEN} component={PhoneNumber} />
+          <Stack.Screen
+            name={SCREENS.VERIFICATION_SCREEN}
+            component={Verification}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast />
