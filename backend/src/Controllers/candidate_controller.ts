@@ -2,15 +2,16 @@ import { sign } from "jsonwebtoken";
 import { compare, hash } from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { CustomRequest } from "../middleware/user.middelware";
 
 const prisma = new PrismaClient();
 
-export type candidateType = {
+export interface candidateType {
   candidateId: number;
   fullName: string;
   email: string;
   password: string;
-};
+}
 
 const createCandidate = async (
   req: Request,
@@ -82,10 +83,10 @@ const loginCandidate = async (
   }
 };
 
-const verifyCandidate = async (req: Request, res: Response) => {
+const verifyCandidate = async (req: CustomRequest, res: Response) => {
   const { verificationNumber, RandomNumber } = req.body;
 
-  if (verificationNumber === RandomNumber) {
+  if (Number(verificationNumber) === Number(RandomNumber)) {
     const updateCandidateState = await prisma.candidate.update({
       where: { candidateId: req.candidateId },
       data: {
@@ -108,8 +109,8 @@ const verifyCandidate = async (req: Request, res: Response) => {
   }
 };
 
-const generateToken = async (id: number): Promise<string> => {
-  return sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
+const generateToken = async (candidateId: number): Promise<string> => {
+  return sign({ candidateId }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 };
 
 export { createCandidate, loginCandidate, verifyCandidate };

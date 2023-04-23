@@ -1,14 +1,19 @@
-import jwt, { Secret, JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
-export const SECRET_KEY: Secret = "your-secret-key-here";
+interface JwtPayload {
+  candidateId: number;
+  iat: number;
+  exp: number;
+}
 
 export interface CustomRequest extends Request {
   token: string | JwtPayload;
+  candidateId: number;
 }
 
 const authMiddleware = async (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -19,8 +24,9 @@ const authMiddleware = async (
       throw new Error();
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY);
-    (req as CustomRequest).token = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) as JwtPayload;
+    req.token = decoded;
+    req.candidateId = decoded.candidateId;
 
     next();
   } catch (err) {
