@@ -16,11 +16,12 @@ import {
 } from "../../constants/Theme";
 import { useNavigation } from "@react-navigation/native";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { SCREENS } from "../types";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = {};
 interface formDataType {
@@ -51,15 +52,15 @@ const Login = (props: Props) => {
         setIsLoading(false);
       } else {
         await axios
-          .post("http://192.168.107.222:6000/api/candidate/login", formData)
+          .post("http://192.168.100.4:6000/api/candidate/login", formData)
           .then((response) => {
             return response.data;
           })
           .then((data) => {
             setIsLoading(false);
             console.log(data);
-            setUser(data);
-            navigation.navigate(SCREENS.PHONE_SCREEN as never);
+            AsyncStorage.setItem("userToken", JSON.stringify(data.token));
+            navigation.navigate(SCREENS.HOME_SCREEN as never);
           })
           .catch((error) => {
             console.log(error);
@@ -73,6 +74,16 @@ const Login = (props: Props) => {
       }
     }
   };
+
+  useEffect(() => {
+    AsyncStorage.getItem("userToken", (err, result) => {
+      if (result) {
+        navigation.navigate(SCREENS.HOME_SCREEN as never);
+      } else {
+        console.log(err);
+      }
+    });
+  }, []);
 
   const handleEmailChange = (emailValue: string) => {
     setFormData({ ...formData, email: emailValue });

@@ -3,8 +3,12 @@ import { View, Text, StyleSheet, Image, SafeAreaView } from "react-native";
 import { COLORS, FONTS, SHADOWS } from "../constants/Theme";
 import { TouchableOpacity } from "react-native";
 import { Animated } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { SCREENS } from "../screens/types";
 
 type SideBarProps = {
+  username: string;
   handleBarClose: () => void;
 };
 
@@ -13,7 +17,8 @@ type sidebarItemsType = {
   title: string;
 }[];
 
-const Sidebar = ({ handleBarClose }: SideBarProps) => {
+const Sidebar = ({ handleBarClose, username }: SideBarProps) => {
+  const navigation = useNavigation();
   const sidebarItems: sidebarItemsType = [
     {
       icon: require("../assets/sideBarIcons/Dashbord.png"),
@@ -37,6 +42,11 @@ const Sidebar = ({ handleBarClose }: SideBarProps) => {
     },
   ];
 
+  const logout = () => {
+    AsyncStorage.clear();
+    navigation.navigate(SCREENS.LOGIN_SCREEN as never);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, zIndex: 10000 }}>
       <Animated.View style={styles.sideBarContainer}>
@@ -59,7 +69,7 @@ const Sidebar = ({ handleBarClose }: SideBarProps) => {
               paddingLeft: 10,
             }}
           >
-            Oussama Chahidi
+            {username.toUpperCase()}
           </Text>
           <TouchableOpacity
             style={{
@@ -90,7 +100,7 @@ const Sidebar = ({ handleBarClose }: SideBarProps) => {
               </TouchableOpacity>
             </View>
           ))}
-          <TouchableOpacity style={styles.logoutBtn}>
+          <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
             <Image
               source={require("../assets/sideBarIcons/LogOut.png")}
               resizeMode="contain"

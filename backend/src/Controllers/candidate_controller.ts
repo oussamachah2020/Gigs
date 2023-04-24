@@ -73,12 +73,24 @@ const loginCandidate = async (
   const passwordsMatching = await compare(password, existedCandidate!.password);
   if (existedCandidate && passwordsMatching) {
     return res.status(200).json({
-      candidate: {
-        email,
-        fullName: existedCandidate.fullName,
-        token: await generateToken(existedCandidate.candidateId),
-        verified: false,
-      },
+      token: await generateToken(existedCandidate.candidateId),
+    });
+  } else {
+    return res.status(404).json({ msg: "No user with the following email" });
+  }
+};
+
+const getUserDataWithToken = async (req: CustomRequest, res: Response) => {
+  const candidate = await prisma.candidate.findUnique({
+    where: {
+      candidateId: req.candidateId,
+    },
+  });
+
+  if (candidate) {
+    return res.status(200).json({
+      fullName: candidate.fullName,
+      email: candidate.email,
     });
   }
 };
@@ -113,4 +125,9 @@ const generateToken = async (candidateId: number): Promise<string> => {
   return sign({ candidateId }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 };
 
-export { createCandidate, loginCandidate, verifyCandidate };
+export {
+  createCandidate,
+  loginCandidate,
+  verifyCandidate,
+  getUserDataWithToken,
+};

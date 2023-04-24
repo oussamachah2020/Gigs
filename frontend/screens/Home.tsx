@@ -16,6 +16,9 @@ import { COLORS, FONTS, LoginStyle, SIZES } from "../constants/Theme";
 import Cards from "../components/Cards";
 import HomeHeader from "../components/HomeHeader";
 import Sidebar from "../components/Sidebar";
+import axios from "axios";
+import useAuthStore, { useBearStore } from "../hook/useZustand";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = {};
 
@@ -38,7 +41,34 @@ const cardData = [
   },
 ];
 
+interface AuthStoreState {
+  token: string;
+  setToken: (token: string) => void;
+}
+
+interface loggedInUserData {
+  fullName: string;
+  email: string;
+}
+
 const Home = (props: Props) => {
+  const [user, setUser] = useState<loggedInUserData>();
+  const [token, setToken] = useState<string | undefined>("");
+
+  const getUserToken = async () => {
+    await AsyncStorage.getItem("userToken")
+      .then((token) => {
+        return setToken(JSON.parse(token!));
+      })
+      .catch((error) => {
+        // handle errors here
+        console.log(error);
+      });
+  };
+
+  console.log("The token", token);
+  getUserToken();
+
   const handleSearch = () => {};
   const [open, setOpen] = useState<boolean>(false);
 
@@ -50,12 +80,37 @@ const Home = (props: Props) => {
     setOpen(true);
   };
 
+  const getUserData = async () => {
+    await axios
+      .get("http://192.168.100.4:6000/api/candidate/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .then((data) => {
+        setUser(data);
+        // console.log(data.email);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getUserData();
+    console.log("user data >>>>>>> ", user?.email);
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <View>
         {open ? (
           <View style={{ zIndex: 1 }}>
-            <Sidebar handleBarClose={handleBarClose} />
+            <Sidebar
+              handleBarClose={handleBarClose}
+              username={user?.fullName}
+            />
           </View>
         ) : null}
         <FlatList
@@ -63,7 +118,7 @@ const Home = (props: Props) => {
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             <HomeHeader
-              username={"oussama chahidi"}
+              username={user?.fullName}
               handleBarOpen={handleBarOpen}
             />
           }
