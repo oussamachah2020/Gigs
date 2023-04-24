@@ -28,9 +28,16 @@ const authMiddleware = async (
     req.token = decoded;
     req.candidateId = decoded.candidateId;
 
+    const expTimestamp = decoded.exp * 1000;
+    const currentTimestamp = new Date().getTime();
+
+    if (expTimestamp < currentTimestamp) {
+      return res.status(400).json({ msg: "Token is expired" });
+    }
+
     next();
   } catch (err) {
-    res.status(401).send("Please authenticate");
+    return res.status(401).json({ msg: "Not Authorized" });
   }
 };
 
