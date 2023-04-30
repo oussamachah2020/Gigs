@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SCREENS } from "../screens/types";
 
 type SideBarProps = {
-  username: string;
+  username: string | null;
   handleBarClose: () => void;
 };
 
@@ -45,6 +45,7 @@ const Sidebar = ({ handleBarClose, username }: SideBarProps) => {
   const logout = () => {
     AsyncStorage.clear();
     navigation.navigate(SCREENS.LOGIN_SCREEN as never);
+    console.log(">>>>>>>>>> LOGOUT");
   };
 
   return (

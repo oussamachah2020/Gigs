@@ -1,6 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,18 +12,18 @@ datasource db {
 }
 
 model Candidate {
-  candidateId  Int       @id @default(autoincrement()) @unique
+  candidateId  String    @id @unique
   fullName     String
   email        String    @unique
   password     String
   verified     Boolean   @default(false)
   createdAt    DateTime  @default(now())
-  updatedAt DateTime     @default(now())
+  updatedAt    DateTime  @default(now())
 }
 
 
 model JobPost {
-  jobId                 Int     @id @default(autoincrement())
+  jobId                 String    @unique @id
   job_title             String 
   company_name          String
   company_location      String
@@ -32,7 +33,7 @@ model JobPost {
 }
 
 model Recruiter {
-  recruiterId Int      @id @default(autoincrement()) 
+  recruiterId String      @id @unique 
   fullName    String
   email       String   @unique
   password    String 
