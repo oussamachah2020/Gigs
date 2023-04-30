@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
 interface JwtPayload {
-  candidateId: number;
+  candidateId: string;
   iat: number;
   exp: number;
 }
 
 export interface CustomRequest extends Request {
   token: string | JwtPayload;
-  candidateId: number;
+  candidateId: string;
 }
 
 const authMiddleware = async (
@@ -24,7 +24,10 @@ const authMiddleware = async (
       throw new Error();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_PUBLIC_SECRET_KEY
+    ) as JwtPayload;
     req.token = decoded;
     req.candidateId = decoded.candidateId;
 

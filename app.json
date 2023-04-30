@@ -7,9 +7,10 @@
     "icon": "./frontend/assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./frontend/assets/splash.png",
+      "image": "./frontend/assets/App_Logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#EC4545",
+      "Text": "Find your dream job"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {

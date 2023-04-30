@@ -13,7 +13,7 @@ import { dashboardStyle } from "../constants/styles/homeTheme";
 import Sidebar from "./Sidebar";
 
 type DashboardHeaderProps = {
-  username: string;
+  username: string | null;
   handleBarOpen: () => void;
 };
 
