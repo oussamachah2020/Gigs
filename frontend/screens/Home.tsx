@@ -17,7 +17,6 @@ import Cards from "../components/Cards";
 import HomeHeader from "../components/HomeHeader";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
-import useAuthStore, { useBearStore } from "../hook/useZustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = {};
@@ -58,7 +57,9 @@ const Home = (props: Props) => {
   const getUserToken = async () => {
     await AsyncStorage.getItem("userToken")
       .then((token) => {
-        return setToken(JSON.parse(token!));
+        7;
+        const parsedToken = JSON.parse(token!);
+        return setToken(parsedToken);
       })
       .catch((error) => {
         // handle errors here
@@ -66,8 +67,7 @@ const Home = (props: Props) => {
       });
   };
 
-  console.log("The token", token);
-  getUserToken();
+  console.log("token >>>>>>>>>", token);
 
   const handleSearch = () => {};
   const [open, setOpen] = useState<boolean>(false);
@@ -81,8 +81,10 @@ const Home = (props: Props) => {
   };
 
   const getUserData = async () => {
+    // console.log("hit");
+
     await axios
-      .get("http://192.168.100.4:6000/api/candidate/", {
+      .get("http://172.18.0.1:6000/api/candidate/", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -90,7 +92,9 @@ const Home = (props: Props) => {
       })
       .then((data) => {
         setUser(data);
-        // console.log(data.email);
+        console.log(data);
+
+        console.log(data.email);
       })
       .catch((error) => {
         console.log(error);
@@ -98,8 +102,8 @@ const Home = (props: Props) => {
   };
 
   useEffect(() => {
+    getUserToken();
     getUserData();
-    console.log("user data >>>>>>> ", user?.email);
   }, []);
 
   return (

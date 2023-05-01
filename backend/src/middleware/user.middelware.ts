@@ -24,7 +24,10 @@ const authMiddleware = async (
       throw new Error();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_PUBLIC_SECRET_KEY
+    ) as JwtPayload;
     req.token = decoded;
     req.candidateId = decoded.candidateId;
 

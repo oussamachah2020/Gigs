@@ -43,35 +43,38 @@ const Login = (props: Props) => {
 
   const loginToAccount = async () => {
     setIsLoading(true);
-    for (const field in formData) {
-      if (!formData[field as keyof formDataType]) {
-        Toast.show({
-          type: "error",
-          text1: "Please enter your informations",
+    if (formData.email === "") {
+      Toast.show({
+        type: "error",
+        text1: "Enter your email address",
+      });
+      setIsLoading(false);
+    } else if (formData.password === "") {
+      Toast.show({
+        type: "error",
+        text1: "Enter your email address",
+      });
+      setIsLoading(false);
+    } else {
+      await axios
+        .post("http://172.18.0.1:6000/api/candidate/login", formData)
+        .then((response) => {
+          return response.data;
+        })
+        .then((data) => {
+          setIsLoading(false);
+          console.log(data);
+          AsyncStorage.setItem("userToken", JSON.stringify(data.token));
+          navigation.navigate(SCREENS.HOME_SCREEN as never);
+        })
+        .catch((error) => {
+          console.log(error);
         });
-        setIsLoading(false);
-      } else {
-        await axios
-          .post("http://192.168.100.4:6000/api/candidate/login", formData)
-          .then((response) => {
-            return response.data;
-          })
-          .then((data) => {
-            setIsLoading(false);
-            console.log(data);
-            AsyncStorage.setItem("userToken", JSON.stringify(data.token));
-            navigation.navigate(SCREENS.HOME_SCREEN as never);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-
-        setFormData((prev) => ({
-          ...prev,
-          email: "",
-          password: "",
-        }));
-      }
+      setFormData((prev) => ({
+        ...prev,
+        email: "",
+        password: "",
+      }));
     }
   };
 

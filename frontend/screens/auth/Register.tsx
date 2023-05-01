@@ -23,6 +23,10 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { auth } from "../../../firebase/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { SCREENS } from "../types";
+import { message } from "antd";
+import axios from "axios";
+import { useBearStore } from "../../hook/useZustand";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RegisterProps = {};
 
@@ -30,7 +34,6 @@ interface formDataType {
   fullName: string;
   email: string;
   password: string;
-  password2: string;
 }
 
 const Register = (props: RegisterProps) => {
@@ -39,13 +42,15 @@ const Register = (props: RegisterProps) => {
     fullName: "",
     email: "",
     password: "",
-    password2: "",
   });
+
+  const baseUrl = useBearStore((state: any) => state.baseUrl);
+  // console.log(">>>>>>>>>> ", baseUrl);
 
   const [user, setUser] = useState<undefined>();
 
   const navigation = useNavigation();
-  const createNewAccout = () => {
+  const createNewAccount = async () => {
     for (const field in formData) {
       if (!formData[field as keyof formDataType]) {
         Toast.show({
@@ -53,40 +58,33 @@ const Register = (props: RegisterProps) => {
           text1: "Please enter your informations",
         });
       } else {
-        if (formData.password === formData.password2) {
-          auth
-            .createUserWithEmailAndPassword(formData.email, formData.password)
-            .then((userCredential) => {
-              const user = userCredential.user;
+        await axios
+          .post("http://172.18.0.1:6000/api/candidate/create/", formData)
+          .then((response) => {
+            return response.data;
+          })
+          .then((data) => {
+            console.log(data);
 
-              setUser((user) => {
-                if (user === null) {
-                  return undefined;
-                }
-              });
-            })
-            .catch((error) => {
-              console.log(error);
+            AsyncStorage.setItem("userToken", JSON.stringify(data.token));
+            Toast.show({
+              type: "error",
+              text1: data?.msg,
             });
-
-          Toast.show({
-            type: "success",
-            text1: "User registered successfully",
+            navigation.navigate(SCREENS.VERIFICATION_SCREEN as never);
+          })
+          .catch((error) => {
+            console.log(error);
           });
 
-          setFormData((prev) => ({
-            ...prev,
-            email: "",
-            fullName: "",
-            password: "",
-            password2: "",
-          }));
-        } else {
-          Toast.show({
-            type: "error",
-            text1: "Passwords not matching !",
-          });
-        }
+        console.log(formData);
+
+        // setFormData((prev) => ({
+        //   ...prev,
+        //   email: "",
+        //   fullName: "",
+        //   password: "",
+        // }));
       }
     }
   };
@@ -101,10 +99,6 @@ const Register = (props: RegisterProps) => {
 
   const handlePasswordChange = (passwordValue: string) => {
     setFormData({ ...formData, password: passwordValue });
-  };
-
-  const handlePassword2Change = (password2Value: string) => {
-    setFormData({ ...formData, password2: password2Value });
   };
 
   return (
@@ -194,14 +188,6 @@ const Register = (props: RegisterProps) => {
           />
         </View>
 
-        <TextInput
-          style={RegisterStyle.input}
-          placeholder="Password Confirmation"
-          secureTextEntry={true}
-          value={formData.password2}
-          onChangeText={handlePassword2Change}
-        />
-
         <Button
           buttonStyle={{
             backgroundColor: COLORS.red,
@@ -217,7 +203,7 @@ const Register = (props: RegisterProps) => {
               "Create an account"
             )
           }
-          onPress={() => {}}
+          onPress={createNewAccount}
         />
         <Text>
           Already have an account?{" "}

@@ -3,6 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { CustomRequest } from "../middleware/user.middelware";
+import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 
@@ -38,11 +39,13 @@ const createCandidate = async (
 
   const newCandidate = await prisma.candidate.create({
     data: {
+      candidateId: uuidv4(),
       fullName,
       email,
       password: hashedPassword,
       verified: false,
     },
+    select: { candidateId: true },
   });
 
   if (newCandidate) {
@@ -70,7 +73,7 @@ const loginCandidate = async (
       },
     });
 
-  const passwordsMatching = await compare(password, existedCandidate!.password);
+  const passwordsMatching = await compare(password, existedCandidate?.password);
   if (existedCandidate && passwordsMatching) {
     return res.status(200).json({
       token: await generateToken(existedCandidate.candidateId),
@@ -121,8 +124,10 @@ const verifyCandidate = async (req: CustomRequest, res: Response) => {
   }
 };
 
-const generateToken = async (candidateId: number): Promise<string> => {
-  return sign({ candidateId }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
+const generateToken = async (candidateId: string): Promise<string> => {
+  return sign({ candidateId }, process.env.JWT_PUBLIC_SECRET_KEY, {
+    expiresIn: "1d",
+  });
 };
 
 export {
