@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
 interface JwtPayload {
-  candidateId: number;
+  candidateId: string;
   iat: number;
   exp: number;
 }
 
 export interface CustomRequest extends Request {
   token: string | JwtPayload;
-  candidateId: number;
+  candidateId: string;
 }
 
 const authMiddleware = async (

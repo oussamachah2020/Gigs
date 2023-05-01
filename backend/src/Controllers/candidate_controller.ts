@@ -7,14 +7,14 @@ import { CustomRequest } from "../middleware/user.middelware";
 const prisma = new PrismaClient();
 
 export interface candidateType {
-  candidateId: number;
+  candidateId: string;
   fullName: string;
   email: string;
   password: string;
 }
 
 const createCandidate = async (
-  req: Request,
+  req: CustomRequest,
   res: Response
 ): Promise<Response<candidateType> | undefined> => {
   const { fullName, email, password }: candidateType = req.body;
@@ -47,7 +47,7 @@ const createCandidate = async (
 
   if (newCandidate) {
     return res.status(201).json({
-      msg: "Account created successefuly",
+      msg: "Account created successfully",
       token: await generateToken(newCandidate.candidateId),
     });
   }
